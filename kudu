@@ -1,0 +1,104 @@
+# Bash completion for Apache Kudu CLI tool 'kudu'
+
+_kudu()
+{
+	COMPREPLY=()
+
+  local cur prev words cword
+  _init_completion || return
+
+	local cmd sub_cmd commands
+	cmd="${words[1]:-}"
+	sub_cmd="${words[2]:-}"
+	commands="cluster fs local_replica master pbc remote_replica table tablet test tserver wal"
+
+	case "${cmd}" in
+		cluster)
+			case "${sub_cmd}" in
+				-*)
+					COMPREPLY=( $(compgen -W "--help" -- ${cur}) )
+					;;
+				ksck)
+					if [[ ${cur} == -* ]] ; then
+						COMPREPLY=( $(compgen -W "--help --checksum_cache_blocks --checksum_scan --checksum_scan_concurrency --nochecksum_snapshot --color --tables --tablets" -- ${cur}) )
+					else
+						_known_hosts_real "${cur}"
+					fi
+					;;
+				*)
+					if [[ ${cur} == ${sub_cmd} ]]; then
+						COMPREPLY=( $(compgen -W "ksck" -- ${cur}) )
+					fi
+					;;
+			esac
+			return
+			;;
+		fs)
+			local sub_cmds="dump format"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		local_replica)
+			local sub_cmds="cmeta dump copy_from_remote delete list"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		master)
+			local sub_cmds="set_flag status timestamp"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		master)
+			local sub_cmds="set_flag status timestamp"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		pbc)
+			local sub_cmds="dump"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		remote_replica)
+			local sub_cmds="check copy delete dump list"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		table)
+			local sub_cmds="delete list"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		tablet)
+			local sub_cmds="change_config leader_step_down"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		test)
+			local sub_cmds="loadgen"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		tserver)
+			local sub_cmds="set_flag status timestamp"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		wal)
+			local sub_cmds="dump"
+			COMPREPLY=( $(compgen -W "${sub_cmds}" -- ${cur}) )
+			return
+			;;
+		*)
+		;;
+	esac
+
+	if [[ ${cur} == -* ]] ; then
+		COMPREPLY=( $(compgen -W "--help --version" -- ${cur}) )
+	else
+		COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+	fi
+
+	return
+}
+
+complete -F _kudu kudu
